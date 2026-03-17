@@ -46,3 +46,7 @@ class TextEmbeddingList:
             )
 
         return out
+
+    def __iter__(self):
+        """Iterate over paired text and embedding tuples."""
+        return zip(self.texts, self.embeddings)

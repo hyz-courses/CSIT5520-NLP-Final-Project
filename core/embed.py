@@ -1,15 +1,33 @@
 from typing import List
-from core.ai_provider.openai_client import get_client
+import asyncio
+from core.ai_provider.openai_client import get_async_client
 from proj.context import get_project_context
 from core.obj.dao import TextEmbeddingList
 
 root, env = get_project_context()
 
 
-def embed_text(input_list: List[str]):
-    client = get_client()
+async def embed_text(input_list: List[str]):
+    """
+    Generate text embeddings using Qwen API asynchronously.
+    The input list should be a list of text documents with
+    pre-constrained length, e.g., 1024 tokens.
+        
+    Args:
+        input_list: A list of text documents to be embedded.
+    
+    Returns:
+        TextEmbeddingList: An object containing the original texts and their
+            corresponding embeddings.
+    
+    Raises:
+        ResponseLengthMismatchError: If the number of embeddings returned by
+            the API does not match the number of input texts.
+    """
+    
+    client = get_async_client()
 
-    completion = client.embeddings.create(
+    completion = await client.embeddings.create(
         model=env.QWEN_TEXT_EMBED_MODEL, input=input_list
     )
 
@@ -19,7 +37,7 @@ def embed_text(input_list: List[str]):
 if __name__ == "__main__":
     # for testing only
     print(
-        embed_text(
+        asyncio.run(embed_text(
             [
                 "The rusty gate creaked loudly every time the wind blew.",
                 "She decided to plant lavender in her garden to attract bees.",
@@ -32,5 +50,5 @@ if __name__ == "__main__":
                 "The cat spent the entire afternoon napping in a patch of sunlight.",
                 "We should always strive to be kind to everyone we meet.",
             ]
-        )
+        ))
     )
