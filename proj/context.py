@@ -10,6 +10,8 @@ class Env:
     QWEN_API_KEY: str
     ALICLOUD_BASE_URL: str
     QWEN_TEXT_EMBED_MODEL: str
+    DIFY_API_URL: str
+    DIFY_API_KEY: str
 
     def __init__(self):
         load_dotenv(Path.joinpath(get_project_root(), "resources", ".env"))
