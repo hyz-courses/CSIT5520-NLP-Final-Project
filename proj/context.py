@@ -12,6 +12,7 @@ class Env:
     QWEN_TEXT_EMBED_MODEL: str
     DIFY_API_URL: str
     DIFY_API_KEY: str
+    MAX_FILE_SIZE_MB: int
 
     def __init__(self):
         load_dotenv(Path.joinpath(get_project_root(), "resources", ".env"))
