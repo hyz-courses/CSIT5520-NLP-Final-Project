@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 
 from main.services.chat import dify_stream_generator
 from main.services.files import embed_files
-from main.dao import ChatRequest, FileUploadRequest
+from main.obj.dao import ChatRequest, FileUploadRequest
 from main.obj.errors import InvalidFileTypeError, OutboundNetworkError
 
 app = FastAPI()

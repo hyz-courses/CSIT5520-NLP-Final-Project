@@ -5,7 +5,7 @@ SSE messages streamed from dify.
 
 import httpx
 from proj.context import get_project_context
-from main.dao import ChatRequest
+from main.obj.dao import ChatRequest
 
 root, env = get_project_context()
 
