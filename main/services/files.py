@@ -58,5 +58,5 @@ async def store_chunks(chunk_list: List[Chunk]) -> int:
         effected_rows = await write_milvus_record(db_records)
         return effected_rows
     except Exception as e:
-        logger.error(f"Error occurred while storing chunks: {e}")
+        logger.error(f"Error occurred while storing chunks: {e}.")
         return -1

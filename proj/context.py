@@ -17,6 +17,7 @@ class Env:
     MILVUS_URI: str
     MILVUS_COLLECTION: str
     MILVUS_TOKEN: str
+    DOCSEARCH_API_KEY: str
 
     def __init__(self):
         load_dotenv(Path.joinpath(get_project_root(), "resources", ".env"))

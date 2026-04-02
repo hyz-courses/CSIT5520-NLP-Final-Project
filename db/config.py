@@ -25,7 +25,7 @@ schema.add_field(
     field_name="original_filename", datatype=DataType.VARCHAR, max_length=1024
 )
 schema.add_field(field_name="title1", datatype=DataType.VARCHAR, max_length=1024)
-schema.add_field(field_name="title2", datatype=DataType.VARCHAR, max_length=1024)
+schema.add_field(field_name="title2", datatype=DataType.VARCHAR, max_length=1024, nullable=True)
 schema.add_field(field_name="text", datatype=DataType.VARCHAR, max_length=65535)
 schema.add_field(field_name="upload_time", datatype=DataType.TIMESTAMPTZ)
 schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=1024)
