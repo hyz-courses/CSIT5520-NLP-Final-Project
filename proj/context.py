@@ -12,7 +12,10 @@ class Env:
     QWEN_TEXT_EMBED_MODEL: str
     DIFY_API_URL: str
     DIFY_API_KEY: str
-    MAX_FILE_SIZE_MB: int
+    MAX_FILE_SIZE_MB: int 
+    MILVUS_URI: str
+    MILVUS_COLLECTION: str
+    MILVUS_TOKEN: str
 
     def __init__(self):
         load_dotenv(Path.joinpath(get_project_root(), "resources", ".env"))

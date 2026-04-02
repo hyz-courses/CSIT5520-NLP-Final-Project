@@ -1,108 +1,64 @@
 from typing import List
+from uuid import uuid4
 
 from pathlib import Path
 from fastapi import UploadFile
+from pymilvus import MilvusClient
 
 from proj.context import get_project_context
 from core.embed import embed_text
+from main.obj.dao import Chunk, DBRecord
 from core.obj.dao import TextEmbeddingList
 from main.obj.errors import InvalidFileTypeError, OutboundNetworkError
 
 root, env = get_project_context()
 
-def validate_file(file: UploadFile) -> bool:
+async def write_milvus_record(db_records: List[DBRecord]) -> int:
     """
-    Given a file, validate its file extension,
-    mime type and size.
+    Given a list of database records, store them into Milvus.
 
     Args:
-        file: The uploaded file.
-    
-    Return:
-        bool: Whether the file is valid.
-    """
-    
-    if file.filename is None or file.size is None:
-        return False
-
-    # Validate File Type
-    ext = Path(file.filename).suffix
-    mime_type = file.content_type
-
-    if ext != ".md" or mime_type != ".md":
-        return False
-
-    # Validate File Size
-    if file.size > (env.MAX_FILE_SIZE_MB << 20):  # 20 MB
-        return False
-    
-    return True
-
-
-def parse_file(file: UploadFile) -> str:
-    """
-    Parse a single .md file into string.
-
-    Args:
-        file: The uploaded file.
-    
-    Returns:
-        str: The returned parsed string from the file.
+        db_records: A list of DBRecord objects to be stored in Milvus.
     """
 
-    # TODO: Parse md files to text.
+    client = MilvusClient(uri=env.MILVUS_URI, token=env.MILVUS_TOKEN)
+    if client is None:
+        raise OutboundNetworkError("Milvus client not connected. Please start Milvus server.")
     
-    return ""
+    insert_data = [db_record.model_dump(mode="python") for db_record in db_records]    
+
+    res = client.insert(collection_name=env.MILVUS_COLLECTION, data=insert_data)
+
+    return res["insert_count"]
 
 
-async def embed_textlist(text_list: List[str]) -> TextEmbeddingList | None:
+async def store_chunks(chunk_list: List[Chunk]) -> int:
     """
     Generate the embedding for this file.
     If any failure is met, return None
 
     Args:
         text_list: The list of text strings to be embedded.
-    
+
     Returns:
         TextEmbeddingList: The list of wrapped text embeddings.
     """
-    
+
     try:
+
+        # From given chunk list, get list of embedding vectors
+        text_list = [chunk.text for chunk in chunk_list]
         text_emb_list = await embed_text(input_list=text_list)
-        return text_emb_list
+        emb_list = text_emb_list.embeddings
+
+        # Compress the chunk list and embedding list into a list of
+        # database records.
+        db_records = [
+            DBRecord(**chunk.model_dump(mode="python"), vector=emb)
+            for (chunk, emb) in zip(chunk_list, emb_list)
+        ]
+
+        effected_rows = await write_milvus_record(db_records)
+        return effected_rows
     except Exception:
-        return None
-
-
-async def embed_files(files: List[UploadFile]) -> int:
-    """
-    Organized pipeline of service.
-
-    Args:
-        files: The list of files.
-    
-    Returns:
-        int: The number of files accepted.
-
-    Raises:
-        InvalidFileTypeError: One or more files has disallowed type.
-        OutboundNetworkError: Having issue communicating with outbound service.
-    """
-    
-    if any([not validate_file(file) for file in files]):
-        raise InvalidFileTypeError(
-            "One or more files has undesired extension or mime type.")
-
-    # List of text embeddings
-    text_emb_list = embed_textlist(text_list=[
-        parse_file(file) for file in files])
-
-    if text_emb_list is None:
-        raise OutboundNetworkError(
-            "Failed to communicate with the embedding service.")
-
-    # TODO: storage
-
-    return len(files)
-    
-    
+        return -1

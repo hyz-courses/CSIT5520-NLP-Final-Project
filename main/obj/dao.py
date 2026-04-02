@@ -7,7 +7,6 @@ from typing import List
 from fastapi import File, UploadFile
 from pydantic import BaseModel
 
-
 class ChatRequest(BaseModel):
     query: str
     user: str = "default-user"
@@ -16,6 +15,18 @@ class ChatRequest(BaseModel):
     response_mode: str = "streaming"
 
 
-class FileUploadRequest(BaseModel):
-    token: str
-    files: List[UploadFile] = File(...)
+class Chunk(BaseModel):
+    original_filename: str
+    title1: str
+    title2: str | None
+    text: str
+    upload_time: str
+
+
+class DBRecord(Chunk):
+    # id: str
+    vector: List[float]
+
+
+class ChunkUploadRequest(BaseModel):
+    chunks: List[Chunk]

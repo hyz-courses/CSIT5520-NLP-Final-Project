@@ -6,8 +6,8 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.responses import StreamingResponse
 
 from main.services.chat import dify_stream_generator
-from main.services.files import embed_files
-from main.obj.dao import ChatRequest, FileUploadRequest
+from main.services.files import store_chunks
+from main.obj.dao import ChatRequest, ChunkUploadRequest
 from main.obj.errors import InvalidFileTypeError, OutboundNetworkError
 
 app = FastAPI()
@@ -30,13 +30,14 @@ async def chat_stream(request: ChatRequest):
     )
 
 
-@app.post("/doc")
-async def doc_upload(request: FileUploadRequest):
+@app.post("/chunk")
+async def chunk_upload(request: ChunkUploadRequest):
     try:
-        num_files = await embed_files(request.files)
-        return {"success": True, "num_files": num_files}
+        num_files = await store_chunks(request.chunks)
+        return {"success": num_files != -1, "num_files": num_files}
     except InvalidFileTypeError | OutboundNetworkError as e:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, e)
+
 
 
 @app.put("/doc")
