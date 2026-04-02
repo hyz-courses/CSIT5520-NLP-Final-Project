@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import Tuple
 from pathlib import Path
 from dataclasses import dataclass
@@ -35,3 +36,43 @@ def get_project_root() -> Path:
 def get_project_context() -> Tuple[Path, Env]:
     """Returns the project root path and environment variables."""
     return get_project_root(), Env()
+
+
+def setup_logger(name: str = "CSIT5520") -> logging.Logger:
+    """
+    Configure logger to write to resources/errlogs directory.
+    
+    Args:
+        name: Logger name, defaults to "CSIT5520"
+    
+    Returns:
+        Configured logger instance
+    """
+    root = get_project_root()
+    log_dir = root / "resources" / "errlogs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+    
+    # File handler
+    log_file = log_dir / "app.log"
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(logging.DEBUG)
+    
+    # Formatter
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    file_handler.setFormatter(formatter)
+    
+    # Add handler to logger
+    if not logger.handlers:
+        logger.addHandler(file_handler)
+    
+    return logger
+
+
+# Global logger instance - initialized once at module load
+logger = setup_logger()

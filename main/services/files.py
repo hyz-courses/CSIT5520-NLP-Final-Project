@@ -1,11 +1,8 @@
 from typing import List
-from uuid import uuid4
 
-from pathlib import Path
-from fastapi import UploadFile
 from pymilvus import MilvusClient
 
-from proj.context import get_project_context
+from proj.context import get_project_context, logger
 from core.embed import embed_text
 from main.obj.dao import Chunk, DBRecord
 from core.obj.dao import TextEmbeddingList
@@ -60,5 +57,6 @@ async def store_chunks(chunk_list: List[Chunk]) -> int:
 
         effected_rows = await write_milvus_record(db_records)
         return effected_rows
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error occurred while storing chunks: {e}")
         return -1
