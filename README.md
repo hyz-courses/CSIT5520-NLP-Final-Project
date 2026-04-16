@@ -27,3 +27,13 @@ ______
 -n 100  -> Read first 100 lines
 -p err  -> Only view err level or above
 ```
+
+Deal with milvus corruption:
+
+```bash
+bash standalone_embed.sh delete
+bash standalone_embed.sh restart
+
+# Re-connect milvus to docker network
+docker network connect docker_default milvus-standalone
+```

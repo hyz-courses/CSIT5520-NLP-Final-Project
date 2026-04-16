@@ -26,7 +26,7 @@ class Chunk(BaseModel):
 class DBRecord(Chunk):
     # id: str
     vector: List[float]
-
+    chunk_hash: str
 
 class ChunkUploadRequest(BaseModel):
     chunks: List[Chunk]
