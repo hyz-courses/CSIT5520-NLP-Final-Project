@@ -13,6 +13,7 @@ class ChatRequest(BaseModel):
     conversation_id: str | None = None
     inputs: dict = {}
     response_mode: str = "streaming"
+    private: bool | None = False
 
 
 class Chunk(BaseModel):

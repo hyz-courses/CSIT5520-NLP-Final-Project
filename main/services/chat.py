@@ -16,13 +16,15 @@ async def dify_stream_generator(request: ChatRequest):
     Yield SSE message from time to time.
     """
 
+    api_key = env.DIFY_API_KEY_PRIVATE if request.private else env.DIFY_API_KEY
+
     async with httpx.AsyncClient(timeout=120.0, follow_redirects=True) as client:
         try:
             async with client.stream(
                 method="POST",
                 url=env.DIFY_API_URL,
                 headers={
-                    "Authorization": f"Bearer {env.DIFY_API_KEY}",
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
                 },
                 json=request.model_dump(mode="json"),

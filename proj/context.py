@@ -13,6 +13,7 @@ class Env:
     QWEN_TEXT_EMBED_MODEL: str
     DIFY_API_URL: str
     DIFY_API_KEY: str
+    DIFY_API_KEY_PRIVATE: str
     MAX_FILE_SIZE_MB: int 
     MILVUS_URI: str
     MILVUS_COLLECTION: str
